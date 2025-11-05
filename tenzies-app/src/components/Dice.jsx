@@ -3,6 +3,10 @@
 
 export default function Dice(props) {
 
-    return (<div class="dice">{props.value}</div>)
+    const styles = {
+        backgroundColor: props.isSelect ? "#59E391" : "#FFFFFF"
+    }
+
+    return (<div className="dice" style={styles} onClick={props.handleDiceSelect}>{props.value}</div>)
 
 }

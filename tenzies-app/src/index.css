@@ -42,6 +42,10 @@ main>.header-section {
   color: #2B283A
 }
 
+.header-section>h3{
+  color:green
+}
+
 .header-section>p {
   max-width: 350px;
   text-align: center;

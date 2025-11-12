@@ -8,9 +8,15 @@ function App() {
 
   const [diceList, setDiceList] = React.useState(() => generateAllNewDice())
 
+  const [isRolling, setIsRolling] = React.useState(false);
+
   // Dice Array Element intialized 
   const diceArrayElement = diceList.map((dice, index) =>
-    <Dice key={dice.id} value={dice.value} handleDiceSelect={() => handleDiceSelect(index)} isSelect={dice.isSelect} />)
+    <Dice key={dice.id} value={dice.value} 
+          handleDiceSelect={() => handleDiceSelect(index)} 
+          isSelect={dice.isSelect} 
+          rolling={isRolling}
+          />)
 
 
   // Game won variable defined
@@ -28,12 +34,20 @@ function App() {
 
   // Dice roll function
   function handleDiceRoll() {
-    (gameWon) ? setDiceList(generateAllNewDice()) :
-      setDiceList(function (prevValue) {
-        return prevValue.map((ele) =>
-          (ele.isSelect) ? ele : { ...ele, value: Math.ceil(Math.random() * 6) }
-        )
-      })
+
+    setIsRolling(true); // start animation
+
+    setTimeout(() => {
+      (gameWon) ? setDiceList(generateAllNewDice()) :
+        setDiceList(function (prevValue) {
+          return prevValue.map((ele) =>
+            (ele.isSelect) ? ele : { ...ele, value: Math.ceil(Math.random() * 6) }
+          )
+        })
+      setIsRolling(false); // end animation
+    }, 600); // matches CSS animation duration
+
+
   }
 
   function handleDiceSelect(ind) {

@@ -7,6 +7,6 @@ export default function Dice(props) {
         backgroundColor: props.isSelect ? "#59E391" : "#FFFFFF"
     }
 
-    return (<div className="dice" style={styles} onClick={props.handleDiceSelect}>{props.value}</div>)
+    return (<div className={`dice ${props.rolling && !props.isSelect ? "rolling" : ""}`} style={styles} onClick={props.handleDiceSelect}>{props.value}</div>)
 
 }

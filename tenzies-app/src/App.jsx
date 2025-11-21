@@ -6,21 +6,50 @@ import Confetti from 'react-confetti'
 
 function App() {
 
+  const TIMER_VAlUE = 60
+
   const [diceList, setDiceList] = React.useState(() => generateAllNewDice())
 
   const [isRolling, setIsRolling] = React.useState(false);
 
-  // Dice Array Element intialized 
-  const diceArrayElement = diceList.map((dice, index) =>
-    <Dice key={dice.id} value={dice.value} 
-          handleDiceSelect={() => handleDiceSelect(index)} 
-          isSelect={dice.isSelect} 
-          rolling={isRolling}
-          />)
+  const [timer, setTimer] = React.useState(TIMER_VAlUE);
 
+  const [gameOver, setGameOver] = React.useState(false);
 
   // Game won variable defined
   const gameWon = diceList.every((ele) => ele.isSelect) && diceList.every((ele) => ele.value === diceList[0].value);
+
+
+  React.useEffect(function () {
+
+    if (gameOver) return;
+
+    const timer = setInterval(() => {
+      setTimer(prev => {
+        if (prev <= 1 || gameWon) {
+          console.log("here");
+          setGameOver(true)
+          return 0
+        }
+        return prev - 1
+      })
+    }, 1000)
+
+    return () => {
+      clearInterval(timer)
+    }
+
+  }, [gameOver, gameWon])
+
+  // Dice Array Element intialized 
+  const diceArrayElement = diceList.map((dice, index) =>
+    <Dice key={dice.id} value={dice.value}
+      handleDiceSelect={() => handleDiceSelect(index)}
+      isSelect={dice.isSelect}
+      rolling={isRolling}
+    />)
+
+
 
 
   // Generate All new dice 
@@ -37,13 +66,19 @@ function App() {
 
     setIsRolling(true); // start animation
 
+    if (gameWon || gameOver) {
+      setDiceList(generateAllNewDice())
+      setTimer(TIMER_VAlUE)
+      setGameOver(false);
+      return;
+    }
+
     setTimeout(() => {
-      (gameWon) ? setDiceList(generateAllNewDice()) :
-        setDiceList(function (prevValue) {
-          return prevValue.map((ele) =>
-            (ele.isSelect) ? ele : { ...ele, value: Math.ceil(Math.random() * 6) }
-          )
-        })
+      setDiceList(function (prevValue) {
+        return prevValue.map((ele) =>
+          (ele.isSelect) ? ele : { ...ele, value: Math.ceil(Math.random() * 6) }
+        )
+      })
       setIsRolling(false); // end animation
     }, 600); // matches CSS animation duration
 
@@ -63,6 +98,8 @@ function App() {
       {gameWon && <Confetti />}
 
       <section className="header-section">
+        {!gameWon && <h1>{timer} sec</h1>}
+        {(gameOver && !gameWon) && <h3>Sorry, You have lost the game</h3>}
         {gameWon && <h3>Congratulations, You WON</h3>}
         <h1>Tenzies</h1>
         <p>Roll until all dices are same. Click each dice to freeze it at its current value between rolls.</p>
@@ -71,7 +108,7 @@ function App() {
         {diceArrayElement}
       </section>
       <section className="btn-section">
-        <button onClick={handleDiceRoll}>{(gameWon) ? 'New Game' : 'Roll'}</button>
+        <button onClick={handleDiceRoll}>{(gameWon || gameOver) ? 'New Game' : 'Roll'}</button>
       </section>
     </main>
 
